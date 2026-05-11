@@ -1,0 +1,86 @@
+import sqlite3
+
+# Connect to SQLite database
+conn = sqlite3.connect("mydatabase.db")
+cursor = conn.cursor()
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS student (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    age INTEGER,
+    course TEXT,
+    CGPA REAL
+)
+""")
+
+# Insert data into 'student'
+cursor.execute("""
+INSERT INTO student (name, age, course, CGPA)
+VALUES (?, ?, ?, ?)
+""", ("Zid", 30, "IT", 8))
+
+cursor.execute("""
+INSERT INTO student (name, age, course, CGPA)
+VALUES (?, ?, ?, ?)
+""", ("Mayur", 18, "CIVIL", 7))
+
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS student1 (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    age INTEGER,
+    course TEXT
+)
+""")
+
+# Insert data into 'student1'
+cursor.execute("""
+INSERT INTO student1 (name, age, course)
+VALUES (?, ?, ?)
+""", ("Zid", 30, "IT"))
+
+cursor.execute("""
+INSERT INTO student1 (name, age, course)
+VALUES (?, ?, ?)
+""", ("Haris", 28, "MACH"))
+
+
+cursor.execute("DROP TABLE IF EXISTS all_students")
+
+cursor.execute("""
+CREATE TABLE all_students (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    age INTEGER,
+    course TEXT,
+    CGPA REAL
+)
+""")
+
+# Insert data from 'student'
+cursor.execute("""
+INSERT INTO all_students (name, age, course, CGPA)
+SELECT name, age, course, CGPA FROM student
+""")
+
+# Insert data from 'student1'
+cursor.execute("""
+INSERT INTO all_students (name, age, course, CGPA)
+SELECT name, age, course, NULL AS CGPA FROM student1
+""")
+
+
+print("All Students Data:\n")
+
+cursor.execute("SELECT * FROM all_students")
+rows = cursor.fetchall()
+
+for row in rows:
+    print(row)
+
+conn.commit()
+conn.close()
+
+print("\nETL process completed successfully.")
